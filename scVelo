@@ -1,0 +1,52 @@
+#.libPaths(c(.libPaths(), "./patrick/miniconda3/envs/scrna/lib/R/library"))
+set_lib_paths("/home/patrick/miniconda3/envs/RNAvelocity/lib/R/library")
+.libPaths()
+
+library(Seurat)
+library(SeuratDisk)
+library(SeuratWrappers)
+
+seu.velocyto <- readRDS("/public/processed/seu.v2_v3.velocyto.rds")
+
+seu.endo <- readRDS("/public/processed/seu.endo.rds")
+
+
+seu.endo.velo <- seu.velocyto[,colnames(seu.endo)]
+seu.endo.velo$anno1 <- seu.endo$anno1[colnames(seu.endo.velo)]
+seu.endo.velo$anno2 <- seu.endo$anno2[colnames(seu.endo.velo)]
+
+table(seu.endo$Res)
+
+#ldat <- ReadVelocity(file = "~/Downloads/SCG71.loom")
+#seu.endo.velo <- as.Seurat(x = ldat)
+seu.endo.velo[["RNA"]] <- seu.endo.velo[["spliced"]]
+seu.endo.velo <- SCTransform(seu.endo.velo)
+seu.endo.velo <- RunPCA(seu.endo.velo)
+
+# Use the embeddings of seu.endo in the seu.endo.velo  
+seu.endo.velo@reductions$umap@cell.embeddings <- seu.endo@reductions$umap@cell.embeddings[colnames(seu.endo.velo),]
+
+DimPlot(seu.endo.velo, group.by = "anno2", label =TRUE)
+
+DefaultAssay(seu.endo.velo) <- "RNA"
+SaveH5Seurat(seu.endo.velo, filename = "SeuEndoVelo.h5Seurat")
+Convert("SeuEndoVelo.h5Seurat", dest = "h5ad")
+
+
+###############################
+# Use python in R studio
+reticulate::repl_python()
+
+# In Python
+
+import scvelo as scv
+adata = scv.read("SeuEndoVelo.h5ad")
+adata
+
+scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)
+scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
+scv.tl.velocity(adata)
+scv.tl.velocity_graph(adata)
+scv.pl.velocity_embedding_stream(adata, basis="umap", color="anno1")
+
+scv.pl.velocity_embedding(adata, basis="umap", color="anno1", arrow_length=3, arrow_size=2, dpi=120)
