@@ -1,0 +1,10 @@
+cellranger count --id=PW030_C000 \
+--transcriptome=/public/refer/10x/refdata-gex-GRCh38-2020-A/ \
+--fastqs=/public/raw/dept6_jqcao_Data/data_20210204/04/PW030/PW030_C000 \
+--sample=PW030_C000 \
+--chemistry=SC3Pv3 \ **(optional, default = auto)** 
+--localcores=10 \
+--localmem=75
+&> PW030_C000_cellranger.log &
+
+[https://support.10xgenomics.com/single-cell-gene expression/software/pipelines/latest/using/count](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/count)
