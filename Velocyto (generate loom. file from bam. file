@@ -1,0 +1,3 @@
+**Velocyto (generate loom. file from bam. file, bam file from [Cellranger](https://www.notion.so/Cellranger-b3da9f7cc33b494db4e67c76e534ca2a) )**
+
+velocyto run10x -m GRCh38_rmsk.gtf PW030_C000/ /public/refer/10x/refdata-gex-GRCh38-2020-A/genes/genes.gtf &> PW030_C000_velocyto.log &
